@@ -1,6 +1,6 @@
 // constants
 let CREEP_LIMITS = {
-    harvester: 5,
+    harvester: 6,
     upgrader: 2,
     builder: 7
 };

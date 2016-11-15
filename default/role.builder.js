@@ -1,5 +1,11 @@
 let CONTAINER_EXTRACT_THREADSHOLD = 300;
 
+function calcDistance(a, b) {
+    return Math.sqrt(
+        Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)
+    );
+}
+
 module.exports = {
     run: function(creep) {
 
@@ -41,17 +47,27 @@ module.exports = {
 	    if (creep.memory.building) {
 	    	// check if any target needs to be repaired
 	    	if (immediate_repair_targets.length) {
-                // immediate_repair_targets.sort((a, b) => a.hits - b.hits);
+                // sort by cloest distance
+                immediate_repair_targets.sort((a, b) => {
+                    return (calcDistance(a.pos, creep.pos) - calcDistance(b.pos, creep.pos));
+                });
+
                 if (creep.repair(immediate_repair_targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(immediate_repair_targets[0]);
                 }
+
             } else if (construction_targets.length) {
 	    		// check if any target needs to be constructed
                 if (creep.build(construction_targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(construction_targets[0]);
                 }
+
             } else if (all_repair_targets.length) {
-                // all_repair_targets.sort((a, b) => a.hits - b.hits);
+                // sort by cloest distance
+                all_repair_targets.sort((a, b) => {
+                    return (calcDistance(a.pos, creep.pos) - calcDistance(b.pos, creep.pos));
+                });
+                
                 if (creep.repair(all_repair_targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(all_repair_targets[0]);
                 }
@@ -67,7 +83,7 @@ module.exports = {
             var isWithdrawing = false;
 
             for (var i in containers) {
-                if (creep.pos.inRangeTo(containers[i]), 4) {
+                if (creep.pos.inRangeTo(containers[i]), 3) {
                     // instruct creep to mine from that container
                     if (creep.withdraw(containers[i], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(containers[i]);
