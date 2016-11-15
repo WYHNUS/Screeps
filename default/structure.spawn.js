@@ -2,7 +2,7 @@
 let CREEP_LIMITS = {
     harvester: 5,
     upgrader: 2,
-    builder: 6
+    builder: 7
 };
 let CREEP_COST = {
     MOVE: 50,
