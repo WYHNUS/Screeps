@@ -8,7 +8,7 @@ let SPAWM = 'Spawn1';
 let NUM = {
     harvester: 1,
     upgrader: 4,
-    builder: 1
+    builder: 2
 };
 let CREEP_COST = {
     MOVE: 50,
@@ -37,24 +37,62 @@ module.exports.loop = function() {
                 console.log('need to increase ' + role + ' from: ' + count[role] + ' to: ' + NUM[role]);
                 // check if spawn has enough energy to create super-creep
                 /*      
-                    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    hard-code super-creep attributes for now:
-                        2*MOVE + WORK + 2*CARRY
-                    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                    hard-code super-creep attributes for now
+                    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
                 */
-                var superCreepCost = 2*CREEP_COST.MOVE + CREEP_COST.WORK + 2*CREEP_COST.CARRY;
-                // build super creep for harvester and upgrader
-                if (role != 'builder' && Game.spawns[SPAWM].energy >= superCreepCost) {
-                    Game.spawns[SPAWM].createCreep([WORK, CARRY, CARRY, MOVE, MOVE], undefined, { role: role });
-                    console.log('spawning creep with role: ' + role);
-                    break;
-                } else if ((role === 'harvester' && count[role] === 0) || (role === 'builder')) {
-                    // two conditions:
-                    // 1. no harvester present -> HAVE to get more harvester
-                    // 2. need builder
-                    // Game.spawns[SPAWM].createCreep([WORK, CARRY, MOVE], undefined, { role: role });  
-                    console.log('spawning creep with role: ' + role);
-                    break;
+                switch (role) {
+                    case 'harvester':
+                        var result = Game.spawns[SPAWM].createCreep([WORK, CARRY, MOVE], undefined, { role: role });  
+                        if (_.isString(result)) {
+                            console.log('spawning creep ' + result + ' with role: ' + role);
+                        } else {
+                            console.log('Spawn error: ' + result);
+                        }
+                        break;
+                    case 'upgrader':
+                        var superCreepCost = CREEP_COST.WORK + 2*CREEP_COST.CARRY + 2*CREEP_COST.MOVE;
+                        if (Game.spawns[SPAWM].energy >= superCreepCost) {
+                            var result = Game.spawns[SPAWM].createCreep(
+                                [WORK, CARRY, CARRY, MOVE, MOVE], 
+                                undefined, 
+                                { role: role }
+                            );
+                            if (_.isString(result)) {
+                                console.log('spawning creep ' + result + ' with role: ' + role);
+                            } else {
+                                console.log('Spawn error: ' + result);
+                            }
+                        }
+                        break;
+                    case 'builder':
+                        var superCreepCost = 2*CREEP_COST.WORK + CREEP_COST.CARRY + 2*CREEP_COST.MOVE;
+                        if (Game.spawns[SPAWM].energy >= superCreepCost) {
+                            var result = Game.spawns[SPAWM].createCreep(
+                                [WORK, CARRY, CARRY, MOVE, MOVE], 
+                                undefined, 
+                                { role: role }
+                            );
+                            if (_.isString(result)) {
+                                console.log('spawning creep ' + result + ' with role: ' + role);
+                            } else {
+                                console.log('Spawn error: ' + result);
+                            }
+                        } else {
+                            var result = Game.spawns[SPAWM].createCreep(
+                                [WORK, CARRY, MOVE], 
+                                undefined, 
+                                { role: role }
+                            ); 
+                            if (_.isString(result)) {
+                                console.log('spawning creep ' + result + ' with role: ' + role);
+                            } else {
+                                console.log('Spawn error: ' + result);
+                            }
+                        }
+                        break;
+                    default:
+                        console.log('unhanddled role: ' + creep.memory.role + ' in creating role.');
                 }
             }
         }
@@ -81,7 +119,7 @@ module.exports.loop = function() {
                     builderCtr.run(creep);
                     break;
                 default:
-                    console.log('unhanddled role: ' + creep.memory.role);
+                    console.log('unhanddled role: ' + creep.memory.role + ' in handler.');
             }
         }
     }
