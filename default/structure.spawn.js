@@ -2,7 +2,7 @@
 let CREEP_LIMITS = {
     harvester: 5,
     upgrader: 2,
-    builder: 7
+    builder: 6
 };
 let CREEP_COST = {
     MOVE: 50,
@@ -11,11 +11,11 @@ let CREEP_COST = {
 }
 let CREEP_DETAILS = {
     harvester: {
-        enhanced: [WORK, WORK, CARRY, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
-        enhanced: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
@@ -23,6 +23,7 @@ let CREEP_DETAILS = {
         basic: [WORK, CARRY, MOVE]
     }
 }
+let HARVESTER_BASIC_THREADSHOLD = 3;
 
 function createCreepLog(result, role, isBasic=false) {
     if (_.isString(result)) {
@@ -86,7 +87,7 @@ module.exports = {
                                 // handle error
                                 createCreepLog(result, role);
                             }
-                        } else if (count[role] <= 2) {
+                        } else if (count[role] <= HARVESTER_BASIC_THREADSHOLD) {
                             // only create basic creep if too little harvester are present
                             var creepCost = calculateCost(CREEP_DETAILS[role].basic);
                             if (currentEnergy >= creepCost) {
