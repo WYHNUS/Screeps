@@ -2,10 +2,10 @@
 
 This repo contains game scripts for [SCREEPS]().
 
-*Default* folder contains actual game scripts used.
+Official document / API can be found [here](http://support.screeps.com/).
 
 ======
 
-*Tutorial* folders contains scripts given from Screep official tutorial.
+*Default* folder contains actual game scripts used.
 
-Official document / API can be found [here](http://support.screeps.com/).
+*Tutorial* folders contains scripts given from Screep official tutorial.
