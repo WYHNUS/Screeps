@@ -20,14 +20,12 @@ module.exports.loop = function() {
     // get number of creeps statistic
     var count = {};
     for (var role in NUM) {
-        count.role = 0;
+        count[role] = 0;
     }
     for (var name in Game.creeps) {
         var role = Game.creeps[name].memory.role;
-        if (!!count.role) {
-            count.role++;
-        } else {
-            count.role = 1;
+        if (count[role] !==  undefined) {
+            count[role]++;
         }
     }
 
@@ -35,8 +33,8 @@ module.exports.loop = function() {
     if (Game.spawns[SPAWM].spawning === null) {
         for (var role in count) {
             // add creeps if not enough
-            if (count.role < NUM.role) {
-                console.log(role + ' : ' + count.role + ' ' + NUM.role);
+            if (count[role] < NUM[role]) {
+                console.log('need to increase ' + role + ' from: ' + count[role] + ' to: ' + NUM[role]);
                 // check if spawn has enough energy to create super-creep
                 /*      
                     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -50,7 +48,7 @@ module.exports.loop = function() {
                     Game.spawns[SPAWM].createCreep([WORK, CARRY, CARRY, MOVE, MOVE], undefined, { role: role });
                     console.log('spawning creep with role: ' + role);
                     break;
-                } else if ((role === 'harvester' && count.role === 0) || (role === 'builder')) {
+                } else if ((role === 'harvester' && count[role] === 0) || (role === 'builder')) {
                     // two conditions:
                     // 1. no harvester present -> HAVE to get more harvester
                     // 2. need builder
