@@ -1,8 +1,8 @@
 // constants
 let CREEP_LIMITS = {
-    harvester: 4,
+    harvester: 5,
     upgrader: 2,
-    builder: 6
+    builder: 7
 };
 let CREEP_COST = {
     MOVE: 50,
@@ -11,15 +11,15 @@ let CREEP_COST = {
 }
 let CREEP_DETAILS = {
     harvester: {
-        enhanced: [WORK, WORK, CARRY, MOVE, MOVE],
+        enhanced: [WORK, WORK, CARRY, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
-        enhanced: [WORK, WORK, CARRY, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
-        enhanced: [WORK, WORK, CARRY, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     }
 }
