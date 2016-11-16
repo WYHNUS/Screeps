@@ -3,8 +3,9 @@ var harvesterCtr = require('role.harvester');
 var upgraderCtr = require('role.upgrader');
 var builderCtr = require('role.builder');
 
-// spawn controller
+// structure controller
 var spawnCtr = require('structure.spawn');
+var towerCtr = require('structure.tower');
 
 var util = require('utility');
 
@@ -48,5 +49,13 @@ module.exports.loop = function() {
     }
 
     // tower logic
-    
+    var towers = Game.rooms[ROOM].find(FIND_STRUCTURES, {
+        filter: (structure) => {
+            return (structure.structureType === STRUCTURE_TOWER
+                && structure.energy > 0);
+        }
+    });
+    for (var id in towers) {
+        towerCtr.attack(towers[id]);
+    }
 }
