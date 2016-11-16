@@ -1,8 +1,17 @@
 // constants
 let CREEP_LIMITS = {
-    harvester: 6,
-    upgrader: 2,
-    builder: 7
+    harvester: {
+        resIndex1: 2,
+        resIndex2: 3
+    },
+    upgrader: {
+        resIndex1: 2,
+        resIndex2: 2
+    },
+    builder: {
+        resIndex1: 5,
+        resIndex2: 2
+    }
 };
 let CREEP_COST = {
     MOVE: 50,
@@ -11,11 +20,11 @@ let CREEP_COST = {
 };
 let CREEP_DETAILS = {
     harvester: {
-        enhanced: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
-        enhanced: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
@@ -52,34 +61,36 @@ module.exports = {
         // get number of creeps statistic
         var count = {};
         for (var role in CREEP_LIMITS) {
-            count[role] = 0;
+            count[role] = {
+                0: 0, 1: 0
+            };
         }
         for (var name in Game.creeps) {
-            var role = Game.creeps[name].memory.role;
-            if (count[role] !==  undefined) {
-                count[role]++;
+            var mem = Game.creeps[name].memory;
+            if (count[mem.role] !==  undefined) {
+                count[mem.role][mem.resIndex]++;
+            } else {
+                console.log('unknown creep role: ' + mem.role + ' with name: ' + name);
             }
         }
-
-        // print statistic
-        // console.log('current round statistic:');
-        // for (var role in count) {
-        //     console.log('number of ' + role + ' is ' + count[role]);
-        // }
 
         for (var role in count) {
             // add creeps if not enough
             var isSpawning = false;
 
-            if (count[role] < CREEP_LIMITS[role]) {
+            if (count[role][0] + count[role][1] < CREEP_LIMITS[role].resIndex1 + CREEP_LIMITS[role].resIndex2) {
                 var currentEnergy = Game.rooms[roomName].energyAvailable;
+                // assign harvest resource index
+                var assignIndex = (count[role][0] < CREEP_LIMITS[role].resIndex1 ? 0 : 1);
 
                 switch (role) {
                     case 'harvester':
                         var superCreepCost = calculateCost(CREEP_DETAILS[role].enhanced);
                         
                         if (currentEnergy >= superCreepCost) {
-                            var result = Game.spawns[spawnName].createCreep(CREEP_DETAILS[role].enhanced, undefined, {role: role});
+                            var result = Game.spawns[spawnName].createCreep(
+                                CREEP_DETAILS[role].enhanced, undefined, { role: role, resIndex: assignIndex }
+                            );
                             if (_.isString(result)) {
                                 isSpawning = true;
                                 createCreepLog(result, role);
@@ -91,7 +102,9 @@ module.exports = {
                             // only create basic creep if too little harvester are present
                             var creepCost = calculateCost(CREEP_DETAILS[role].basic);
                             if (currentEnergy >= creepCost) {
-                                var result = Game.spawns[spawnName].createCreep(CREEP_DETAILS[role].basic, undefined, {role: role}); 
+                                var result = Game.spawns[spawnName].createCreep(
+                                    CREEP_DETAILS[role].basic, undefined, { role: role, resIndex: assignIndex }
+                                ); 
                                 if (_.isString(result)) {
                                     isSpawning = true;
                                     createCreepLog(result, role, true);
@@ -109,7 +122,9 @@ module.exports = {
                         var superCreepCost = calculateCost(CREEP_DETAILS[role].enhanced);
                         
                         if (currentEnergy >= superCreepCost) {
-                            var result = Game.spawns[spawnName].createCreep(CREEP_DETAILS[role].enhanced, undefined, {role: role});
+                            var result = Game.spawns[spawnName].createCreep(
+                                CREEP_DETAILS[role].enhanced, undefined, { role: role, resIndex: assignIndex }
+                            );
                             if (_.isString(result)) {
                                 isSpawning = true;
                                 createCreepLog(result, role);

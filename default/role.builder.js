@@ -112,11 +112,7 @@ module.exports = {
             }
 
             if (!isWithdrawing) {
-                // move to first found source
-                var sources = creep.room.find(FIND_SOURCES);
-                if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0]);
-                }
+                util.instructHarvest(creep);
             }
 	    }
 

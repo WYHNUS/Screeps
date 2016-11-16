@@ -22,7 +22,7 @@ module.exports.loop = function() {
             // remove creep from memory if dead
             delete Memory.creeps[name];
             console.log('creep ' + name + ' died. :(');
-        } else {
+        } else if (!creep.spawning) {
             // instruct to work based on role
             switch (creep.memory.role) {
                 case 'harvester':

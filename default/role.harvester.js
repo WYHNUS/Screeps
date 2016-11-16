@@ -5,7 +5,6 @@ let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
 module.exports = {
     run: function(creep) {
 
-        var sources = creep.room.find(FIND_SOURCES);
         // get all structure need to be energised
         var targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
@@ -46,14 +45,7 @@ module.exports = {
             }
 
             if (needHarvest) {
-                // if multiple exists, harvest second one
-                if (sources.length >= 1) {
-                    if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(sources[1]);
-                    }
-                } else if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(sources[0]);
-                }
+                util.instructHarvest(creep);
             }
 
         } else if (targets.length) {
@@ -71,6 +63,7 @@ module.exports = {
             }
         } else {
             // nothing to do -> check if creep is within 3 tiles of any of the sources
+            var sources = creep.room.find(FIND_SOURCES);
             for (var i in sources) {
                 if (creep.pos.inRangeTo(sources[i]), 3) {
                     // instruct creep to move away towards gather point to prevent blocking source
