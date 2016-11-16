@@ -5,7 +5,8 @@ let CONTAINER_EXTRACT_THREADSHOLD = 300;
 module.exports = {
     run: function(creep) {
 
-	    if (creep.memory.building && creep.carry.energy == 0) {
+        // go gather energy if not enough
+	    if (creep.memory.building && creep.carry.energy === 0) {
             creep.memory.building = false;
             creep.say('harvesting');
 	    }
@@ -14,34 +15,29 @@ module.exports = {
 	        creep.say('building');
 	    }
 
-	    // find construction sites which need to be built
-	    var construction_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-
-	    // find building which needs to be repaired immediately
-	    // repair condition --> 
-        //      wall / rampart / container: less than 2k of the maxHits
-        //      otherwise: less than 1/2 of the maxHits
-	    var immediate_repair_targets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return ((structure.structureType !== STRUCTURE_WALL && 
-                            structure.structureType !== STRUCTURE_RAMPART &&
-                            structure.structureType !== STRUCTURE_CONTAINER) && 
-                            structure.hits < structure.hitsMax / 2) 
-                            ||
-                           ((structure.structureType === STRUCTURE_WALL || 
-                            structure.structureType === STRUCTURE_RAMPART ||
-                            structure.structureType === STRUCTURE_CONTAINER) && 
-                            structure.hits < 2000);
-                }
-        });
-        var all_repair_targets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.hits < 0.9 * structure.hitsMax);
-                }
-        });
-
 	    if (creep.memory.building) {
-	    	// check if any target needs to be repaired
+            // find construction sites which need to be built
+            var construction_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+
+            // find building which needs to be repaired immediately
+            // repair condition --> 
+            //      wall / rampart / container: less than 2k of the maxHits
+            //      otherwise: less than 1/2 of the maxHits
+            var immediate_repair_targets = creep.room.find(FIND_STRUCTURES, {
+                    filter: (structure) => {
+                        return ((structure.structureType !== STRUCTURE_WALL && 
+                                structure.structureType !== STRUCTURE_RAMPART &&
+                                structure.structureType !== STRUCTURE_CONTAINER) && 
+                                structure.hits < structure.hitsMax / 2) 
+                                ||
+                               ((structure.structureType === STRUCTURE_WALL || 
+                                structure.structureType === STRUCTURE_RAMPART ||
+                                structure.structureType === STRUCTURE_CONTAINER) && 
+                                structure.hits < 2000);
+                    }
+            });
+
+	    	// check if any target needs to be repaired immediately
 	    	if (immediate_repair_targets.length) {
                 // sort by cloest distance
                 immediate_repair_targets.sort((a, b) => {
@@ -49,23 +45,49 @@ module.exports = {
                 });
 
                 if (creep.repair(immediate_repair_targets[0]) == ERR_NOT_IN_RANGE) {
+                    creep.say('IM repair!');
                     creep.moveTo(immediate_repair_targets[0]);
                 }
 
             } else if (construction_targets.length) {
 	    		// check if any target needs to be constructed
                 if (creep.build(construction_targets[0]) == ERR_NOT_IN_RANGE) {
+                    creep.say('Construct!');
                     creep.moveTo(construction_targets[0]);
                 }
 
-            } else if (all_repair_targets.length) {
-                // sort by cloest distance
-                all_repair_targets.sort((a, b) => {
-                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
+            } else  {
+                var all_repair_targets = creep.room.find(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return (structure.hits < 0.9 * structure.hitsMax);
+                        }
                 });
-                
-                if (creep.repair(all_repair_targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(all_repair_targets[0]);
+
+                if (all_repair_targets.length) {
+                    // repair anything in range, sort by lowest hp first
+                    var in_range_targets = creep.pos.findInRange(all_repair_targets, 3);
+                    in_range_targets.sort((a, b) => {
+                        return (a.hits - b.hits);
+                    });
+
+                    if (in_range_targets.length) {
+                        var ans = creep.repair(in_range_targets[0]);
+                        if (ans) {
+                            console.log('repair nearest building error ' + ans);
+                        } else {
+                            creep.say('repair IR!');
+                        }
+                    } else {
+                        // sort by cloest distance
+                        all_repair_targets.sort((a, b) => {
+                            return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
+                        });
+                        
+                        if (creep.repair(all_repair_targets[0]) == ERR_NOT_IN_RANGE) {
+                            creep.say('repair');
+                            creep.moveTo(all_repair_targets[0]);
+                        }
+                    }
                 }
             }
 	    } else {
