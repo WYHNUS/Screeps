@@ -95,11 +95,34 @@ module.exports = {
         return isWithdrawing;
 	},
 
+	rechargeTowerIfNearby: function(creep) {
+		var hasTransfered = false;
+		if (creep.carry.energy > 0) {
+			var towers = creep.room.find(FIND_STRUCTURES, {
+	            filter: (structure) => {
+	                return (structure.structureType === STRUCTURE_TOWER 
+	                    && structure.energyCapacity > structure.energy);
+	            }
+	        });
+	        var inRangeTowers = creep.pos.findInRange(towers, 5);
+
+	        if (inRangeTowers.length) {
+	        	hasTransfered = true;
+	        	creep.say('tower!');
+	            // fill target
+	            if (creep.transfer(inRangeTowers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+	                creep.moveTo(inRangeTowers[0]);
+	            }
+	        }
+	    }
+	    return hasTransfered;
+	},
+
 	moveAwayFromSource: function(creep) {
 		var hasMoved = false;
 		var sources = creep.room.find(FIND_SOURCES);
         for (var i in sources) {
-            if (creep.pos.inRangeTo(sources[i]), 3) {
+            if (creep.pos.inRangeTo(sources[i], 2)) {
                 // instruct creep to move away towards gather point to prevent blocking source
                 creep.say('dont block!');
                 var result = creep.moveTo(Game.flags[GATHER_WHEN_IDLE_FLAG]);   // 0 if okay

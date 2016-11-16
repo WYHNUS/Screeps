@@ -13,7 +13,9 @@ module.exports = {
 	        creep.say('building');
 	    }
 
-	    if (creep.memory.building) {
+        if (util.rechargeTowerIfNearby(creep)) {
+
+        } else if (creep.memory.building) {
             // find construction sites which need to be built
             var construction_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
 
@@ -66,16 +68,15 @@ module.exports = {
                     });
 
                     if (in_range_targets.length) {
-                        // move away from source to prevent blocking 
-                        if (util.moveAwayFromSource(creep)) {
-                            // then repair any building
-                            var ans = creep.repair(in_range_targets[0]);
-                            if (ans) {
-                                console.log('repair nearest building error ' + ans);
-                            } else {
-                                creep.say('repair IR!');
-                            }
+                        // then repair any building
+                        var ans = creep.repair(in_range_targets[0]);
+                        if (ans) {
+                            console.log('repair nearest building error ' + ans);
+                        } else {
+                            creep.say('repair IR!');
                         }
+                        // move away from source to prevent blocking 
+                        util.moveAwayFromSource(creep);
                     } else {
                         // sort by cloest distance
                         all_repair_targets.sort((a, b) => {

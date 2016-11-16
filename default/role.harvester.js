@@ -5,11 +5,11 @@ module.exports = {
 
         // get all structure need to be energised
         var targets = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType === STRUCTURE_EXTENSION || 
-                            structure.structureType === STRUCTURE_SPAWN) 
-                        && (structure.energyCapacity > structure.energy);
-                }
+            filter: (structure) => {
+                return (structure.structureType === STRUCTURE_EXTENSION || 
+                        structure.structureType === STRUCTURE_SPAWN) 
+                    && (structure.energyCapacity > structure.energy);
+            }
         });
         // get containers can be filled
         var containers = creep.room.find(FIND_STRUCTURES, {
