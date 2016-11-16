@@ -8,7 +8,7 @@ let CREEP_COST = {
     MOVE: 50,
     WORK: 100,
     CARRY: 50
-}
+};
 let CREEP_DETAILS = {
     harvester: {
         enhanced: [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
@@ -22,7 +22,7 @@ let CREEP_DETAILS = {
         enhanced: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     }
-}
+};
 let HARVESTER_BASIC_THREADSHOLD = 3;
 
 function createCreepLog(result, role, isBasic=false) {

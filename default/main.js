@@ -6,6 +6,8 @@ var builderCtr = require('role.builder');
 // spawn controller
 var spawnCtr = require('structure.spawn');
 
+var util = require('utility');
+
 // constant
 let SPAWM = 'Spawn1';
 let ROOM = 'W63N43';
@@ -37,6 +39,8 @@ module.exports.loop = function() {
             }
         }
     }
+
+    // util.getAllCreepsInfo();
 
     // check if is currently spawning
     if (Game.spawns[SPAWM].spawning === null) {

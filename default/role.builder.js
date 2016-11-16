@@ -1,10 +1,6 @@
-let CONTAINER_EXTRACT_THREADSHOLD = 300;
+var util = require('utility');
 
-function calcDistance(a, b) {
-    return Math.sqrt(
-        Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2)
-    );
-}
+let CONTAINER_EXTRACT_THREADSHOLD = 300;
 
 module.exports = {
     run: function(creep) {
@@ -40,7 +36,7 @@ module.exports = {
         });
         var all_repair_targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return (structure.hits < structure.hitsMax);
+                    return (structure.hits < 0.9 * structure.hitsMax);
                 }
         });
 
@@ -49,7 +45,7 @@ module.exports = {
 	    	if (immediate_repair_targets.length) {
                 // sort by cloest distance
                 immediate_repair_targets.sort((a, b) => {
-                    return (calcDistance(a.pos, creep.pos) - calcDistance(b.pos, creep.pos));
+                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
                 });
 
                 if (creep.repair(immediate_repair_targets[0]) == ERR_NOT_IN_RANGE) {
@@ -65,7 +61,7 @@ module.exports = {
             } else if (all_repair_targets.length) {
                 // sort by cloest distance
                 all_repair_targets.sort((a, b) => {
-                    return (calcDistance(a.pos, creep.pos) - calcDistance(b.pos, creep.pos));
+                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
                 });
                 
                 if (creep.repair(all_repair_targets[0]) == ERR_NOT_IN_RANGE) {

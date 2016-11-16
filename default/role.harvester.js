@@ -1,3 +1,5 @@
+var util = require('utility');
+
 let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
 
 module.exports = {
@@ -23,7 +25,8 @@ module.exports = {
         // check if need there is a need to gather more energy
         if (targets.length > 0 || containers.length > 0) {
 
-            if (creep.carry.energy < creep.carryCapacity) {
+            // if less than 1/2 of the total energy -> go back and gather more sources!
+            if (creep.carry.energy < creep.carryCapacity / 2) {
                 // if multiple exists, harvest second one
                 if (sources.length >= 1) {
                     if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
@@ -33,6 +36,10 @@ module.exports = {
                     creep.moveTo(sources[0]);
                 }
             } else if (targets.length > 0) {
+                // sort by cloest distance
+                targets.sort((a, b) => {
+                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
+                });
                 // re-energise the building before container!
                 if (creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(targets[0]);
