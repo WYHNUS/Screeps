@@ -1,7 +1,5 @@
 var util = require('utility');
 
-let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
-
 module.exports = {
     run: function(creep) {
 
@@ -62,17 +60,8 @@ module.exports = {
                 creep.moveTo(containers[0]);
             }
         } else {
-            // nothing to do -> check if creep is within 3 tiles of any of the sources
-            var sources = creep.room.find(FIND_SOURCES);
-            for (var i in sources) {
-                if (creep.pos.inRangeTo(sources[i]), 3) {
-                    // instruct creep to move away towards gather point to prevent blocking source
-                    var result = creep.moveTo(Game.flags[GATHER_WHEN_IDLE_FLAG]);   // 0 if okay
-                    if (result) {
-                        console.log('error: ' + result + ' when moving to: ' + GATHER_WHEN_IDLE_FLAG);
-                    }
-                }
-            }
+            // nothing to do -> move away to prevent blocking
+            util.moveAwayFromSource(creep);
         }
     }
 };

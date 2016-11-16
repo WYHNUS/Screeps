@@ -39,7 +39,6 @@ module.exports.loop = function() {
             }
         }
     }
-
     // util.getAllCreepsInfo();
 
     // check if is currently spawning
@@ -47,4 +46,7 @@ module.exports.loop = function() {
         // if not spawning, spawn if needed
         spawnCtr.spawn(ROOM, SPAWM);
     }
+
+    // tower logic
+    
 }

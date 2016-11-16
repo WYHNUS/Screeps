@@ -1,7 +1,5 @@
 var util = require('utility');
 
-let CONTAINER_EXTRACT_THREADSHOLD = 300;
-
 module.exports = {
     run: function(creep) {
 
@@ -25,15 +23,10 @@ module.exports = {
             //      otherwise: less than 1/2 of the maxHits
             var immediate_repair_targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
-                        return ((structure.structureType !== STRUCTURE_WALL && 
-                                structure.structureType !== STRUCTURE_RAMPART &&
-                                structure.structureType !== STRUCTURE_CONTAINER) && 
-                                structure.hits < structure.hitsMax / 2) 
-                                ||
-                               ((structure.structureType === STRUCTURE_WALL || 
-                                structure.structureType === STRUCTURE_RAMPART ||
-                                structure.structureType === STRUCTURE_CONTAINER) && 
-                                structure.hits < 2000);
+                        return Math.min(
+                            structure.hits < structure.hitsMax / 2,
+                            structure.hits < 2000
+                        );
                     }
             });
 
@@ -43,14 +36,16 @@ module.exports = {
                 immediate_repair_targets.sort((a, b) => {
                     return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
                 });
-
                 if (creep.repair(immediate_repair_targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.say('IM repair!');
                     creep.moveTo(immediate_repair_targets[0]);
                 }
 
             } else if (construction_targets.length) {
-	    		// check if any target needs to be constructed
+	    		// check if any target needs to be constructed, sort by nearest distance first
+                construction_targets.sort((a, b) => {
+                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
+                });
                 if (creep.build(construction_targets[0]) == ERR_NOT_IN_RANGE) {
                     creep.say('Construct!');
                     creep.moveTo(construction_targets[0]);
@@ -71,11 +66,15 @@ module.exports = {
                     });
 
                     if (in_range_targets.length) {
-                        var ans = creep.repair(in_range_targets[0]);
-                        if (ans) {
-                            console.log('repair nearest building error ' + ans);
-                        } else {
-                            creep.say('repair IR!');
+                        // move away from source to prevent blocking 
+                        if (util.moveAwayFromSource(creep)) {
+                            // then repair any building
+                            var ans = creep.repair(in_range_targets[0]);
+                            if (ans) {
+                                console.log('repair nearest building error ' + ans);
+                            } else {
+                                creep.say('repair IR!');
+                            }
                         }
                     } else {
                         // sort by cloest distance
@@ -91,27 +90,7 @@ module.exports = {
                 }
             }
 	    } else {
-            // check if any container with enough energy nearby
-            var containers = creep.room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.structureType === STRUCTURE_CONTAINER)
-                        && (structure.store[RESOURCE_ENERGY] >= CONTAINER_EXTRACT_THREADSHOLD);
-                }
-            });
-            var isWithdrawing = false;
-
-            for (var i in containers) {
-                if (creep.pos.inRangeTo(containers[i], 3)) {
-                    // instruct creep to mine from that container
-                    if (creep.withdraw(containers[i], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(containers[i]);
-                    }
-                    isWithdrawing = true;
-                    break;
-                }
-            }
-
-            if (!isWithdrawing) {
+            if (!util.withdrawFromNearbyContainer(creep)) {
                 util.instructHarvest(creep);
             }
 	    }

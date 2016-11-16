@@ -16,7 +16,9 @@ module.exports = {
                 creep.moveTo(creep.room.controller);
             }
         } else {
-            util.instructHarvest(creep);
+            if (!util.withdrawFromNearbyContainer(creep)) {
+                util.instructHarvest(creep);
+            }
         }
     }
 };
