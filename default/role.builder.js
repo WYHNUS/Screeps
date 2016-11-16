@@ -101,7 +101,7 @@ module.exports = {
             var isWithdrawing = false;
 
             for (var i in containers) {
-                if (creep.pos.inRangeTo(containers[i]), 3) {
+                if (creep.pos.inRangeTo(containers[i], 3)) {
                     // instruct creep to mine from that container
                     if (creep.withdraw(containers[i], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(containers[i]);
