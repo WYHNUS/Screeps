@@ -20,9 +20,6 @@ module.exports = {
             var construction_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
 
             // find building which needs to be repaired immediately
-            // repair condition --> 
-            //      wall / rampart / container: less than 2k of the maxHits
-            //      otherwise: less than 1/2 of the maxHits
             var immediate_repair_targets = creep.room.find(FIND_STRUCTURES, {
                     filter: (structure) => {
                         return Math.min(

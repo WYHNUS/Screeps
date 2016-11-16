@@ -1,5 +1,6 @@
 let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
 let CONTAINER_EXTRACT_THREADSHOLD = 300;
+let MIN_CD_TO_TRAVEL = 30;
 
 module.exports = {
 	getAllCreepsInfo: function() {
@@ -18,7 +19,7 @@ module.exports = {
 	    console.log('\n name     role    resIndex    TTL');
 	    for (var name in Game.creeps) {
 	        var creep = Game.creeps[name];
-	        console.log(name + '  ' + creep.memory.role + '     ' + creep.memory.resIndex + '       ' + creep.ticksToLive);
+	        console.log(name + '  ' + creep.memory.role + '     ' + (creep.memory.resIndex+1) + '       ' + creep.ticksToLive);
 	    }
 
 	    console.log('\n role statistic');
@@ -39,17 +40,33 @@ module.exports = {
 		var sources = creep.room.find(FIND_SOURCES);
 		var chooseContainer = true;
         // choosee resource to harvest based on resIndex
-        if (creep.memory.resIndex === 1 && sources.length >= 1 && sources[1].energy > 0) {
-        	chooseContainer = false;
-            if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[1]);
-            }
-        } else if (sources[0].energy > 0) {
-        	chooseContainer = false;
-        	if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
-	            creep.moveTo(sources[0]);
+        if (creep.memory.resIndex === 1 && sources.length >= 1) {
+        	if (sources[1].energy > 0) {
+	        	chooseContainer = false;
+	            if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
+	                creep.moveTo(sources[1]);
+	            }
+        	} else if (sources[1].ticksToRegeneration > MIN_CD_TO_TRAVEL 
+        			&& sources[0].energy > 0) {
+        		chooseContainer = false;
+	        	if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
+		            creep.moveTo(sources[0]);
+		        }
+        	}
+        } else {
+        	if (sources[0].energy > 0) {
+	        	chooseContainer = false;
+	        	if (creep.harvest(sources[0]) == ERR_NOT_IN_RANGE) {
+		            creep.moveTo(sources[0]);
+		        }
+	        } else if (sources[0].ticksToRegeneration > MIN_CD_TO_TRAVEL
+	        		&& sources[1].energy > 0 ) {
+	        	chooseContainer = false;
+	        	if (creep.harvest(sources[1]) == ERR_NOT_IN_RANGE) {
+	                creep.moveTo(sources[1]);
+	            }
 	        }
-        }
+	    }
 
         // choose nearest container to extract resource from 
         // (not true for harvester --> buggy loophole logic otherwise for now)
@@ -62,7 +79,7 @@ module.exports = {
                 }
             });
             containers.sort((a, b) => {
-                return (calcDistance(a.pos, creep.pos) - calcDistance(b.pos, creep.pos));
+                return (this.calcDistance(a.pos, creep.pos) - this.calcDistance(b.pos, creep.pos));
             });
 
             if (containers.length) {
@@ -86,6 +103,7 @@ module.exports = {
             if (creep.pos.inRangeTo(containers[i], 3)) {
                 // instruct creep to mine from that container
                 if (creep.withdraw(containers[i], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                	creep.say('container!');
                     creep.moveTo(containers[i]);
                 }
                 isWithdrawing = true;
@@ -122,13 +140,10 @@ module.exports = {
 		var hasMoved = false;
 		var sources = creep.room.find(FIND_SOURCES);
         for (var i in sources) {
-            if (creep.pos.inRangeTo(sources[i], 2)) {
+            if (creep.pos.inRangeTo(sources[i], 1)) {
                 // instruct creep to move away towards gather point to prevent blocking source
                 creep.say('dont block!');
-                var result = creep.moveTo(Game.flags[GATHER_WHEN_IDLE_FLAG]);   // 0 if okay
-                if (result) {
-                    // console.log('error: ' + result + ' when moving to: ' + GATHER_WHEN_IDLE_FLAG);
-                } else {
+                if (!creep.moveTo(Game.flags[GATHER_WHEN_IDLE_FLAG])) {
 	            	hasMoved = true;
 	            	break;
                 }

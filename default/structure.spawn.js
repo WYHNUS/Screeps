@@ -6,10 +6,10 @@ let CREEP_LIMITS = {
     },
     upgrader: {
         resIndex1: 2,
-        resIndex2: 2
+        resIndex2: 1
     },
     builder: {
-        resIndex1: 2,
+        resIndex1: 1,
         resIndex2: 2
     }
 };
@@ -24,15 +24,15 @@ let CREEP_DETAILS = {
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
-        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
-        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
         basic: [WORK, CARRY, MOVE]
     }
 };
-let HARVESTER_BASIC_THREADSHOLD = 3;
+let HARVESTER_BASIC_THREADSHOLD = 2;
 
 function createCreepLog(result, role, isBasic=false) {
     if (_.isString(result)) {
