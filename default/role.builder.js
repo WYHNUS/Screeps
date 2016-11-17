@@ -13,7 +13,7 @@ module.exports = {
 	        creep.say('building');
 	    }
 
-        if (util.rechargeTowerIfNearby(creep)) {
+        if (util.rechargeTowerIfNearby(creep) || util.pickupNearbyResource(creep)) {
 
         } else if (creep.memory.building) {
             // find construction sites which need to be built

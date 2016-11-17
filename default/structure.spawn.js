@@ -20,7 +20,7 @@ let CREEP_COST = {
 };
 let CREEP_DETAILS = {
     harvester: {
-        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, CARRY, MOVE],
+        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {

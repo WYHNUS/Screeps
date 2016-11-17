@@ -1,6 +1,7 @@
 let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
-let CONTAINER_EXTRACT_THREADSHOLD = 300;
+let CONTAINER_EXTRACT_THRESHOLD = 300;
 let MIN_CD_TO_TRAVEL = 30;
+let ENERGY_PICKUP_THRESHOLD = 10;
 
 module.exports = {
 	getAllCreepsInfo: function() {
@@ -89,7 +90,7 @@ module.exports = {
             });
 
             if (containers.length) {
-	            if (creep.withdraw(containers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+	            if (creep.withdraw(containers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
 	                creep.moveTo(containers[0]);
 	            }
             }
@@ -100,7 +101,7 @@ module.exports = {
 		var containers = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType === STRUCTURE_CONTAINER)
-                    && (structure.store[RESOURCE_ENERGY] >= CONTAINER_EXTRACT_THREADSHOLD);
+                    && (structure.store[RESOURCE_ENERGY] >= CONTAINER_EXTRACT_THRESHOLD);
             }
         });
         var isWithdrawing = false;
@@ -108,7 +109,7 @@ module.exports = {
         for (var i in containers) {
             if (creep.pos.inRangeTo(containers[i], 3)) {
                 // instruct creep to mine from that container
-                if (creep.withdraw(containers[i], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                if (creep.withdraw(containers[i], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
                 	creep.say('container!');
                     creep.moveTo(containers[i]);
                 }
@@ -120,7 +121,7 @@ module.exports = {
 	},
 
 	rechargeTowerIfNearby: function(creep) {
-		var hasTransfered = false;
+		var isTransferring = false;
 		if (creep.carry.energy > 0) {
 			var towers = creep.room.find(FIND_STRUCTURES, {
 	            filter: (structure) => {
@@ -131,30 +132,50 @@ module.exports = {
 	        var inRangeTowers = creep.pos.findInRange(towers, 5);
 
 	        if (inRangeTowers.length) {
-	        	hasTransfered = true;
+	        	isTransferring = true;
 	        	creep.say('tower!');
 	            // fill target
-	            if (creep.transfer(inRangeTowers[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+	            if (creep.transfer(inRangeTowers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
 	                creep.moveTo(inRangeTowers[0]);
 	            }
 	        }
 	    }
-	    return hasTransfered;
+	    return isTransferring;
+	},
+
+	pickupNearbyResource: function(creep) {
+		var isPickingUp = false;
+		// check if creep can pickup
+		if (creep.carry.energy <= creep.carryCapacity - 10) {
+			var droppedEnergy = creep.pos.findInRange(FIND_DROPPED_ENERGY, 4, {
+				filter: (energy) => {
+                    return energy.amount > ENERGY_PICKUP_THRESHOLD;
+                }
+			});
+			if (droppedEnergy.length > 0) {
+				isPickingUp = true;
+				creep.say('no waste!');
+				if(creep.pickup(droppedEnergy[0]) === ERR_NOT_IN_RANGE) {
+			        creep.moveTo(droppedEnergy[0]);
+			    }
+			}
+		}
+		return isPickingUp;
 	},
 
 	moveAwayFromSource: function(creep) {
-		var hasMoved = false;
+		var isMoving = false;
 		var sources = creep.room.find(FIND_SOURCES);
         for (var i in sources) {
             if (creep.pos.inRangeTo(sources[i], 1)) {
                 // instruct creep to move away towards gather point to prevent blocking source
                 creep.say('dont block!');
                 if (!creep.moveTo(Game.flags[GATHER_WHEN_IDLE_FLAG])) {
-	            	hasMoved = true;
+	            	isMoving = true;
 	            	break;
                 }
             }
         }
-        return hasMoved;
+        return isMoving;
 	}
 }
