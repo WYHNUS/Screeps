@@ -5,12 +5,12 @@ let CREEP_LIMITS = {
         resIndex2: 2
     },
     upgrader: {
-        resIndex1: 2,
+        resIndex1: 1,
         resIndex2: 1
     },
     builder: {
         resIndex1: 1,
-        resIndex2: 2
+        resIndex2: 1
     }
 };
 let CREEP_COST = {
@@ -20,15 +20,15 @@ let CREEP_COST = {
 };
 let CREEP_DETAILS = {
     harvester: {
-        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
-        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
-        enhanced: [WORK, WORK, WORK, WORK, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     }
 };
