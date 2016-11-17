@@ -2,6 +2,7 @@ let GATHER_WHEN_IDLE_FLAG = 'Harvester_Gather_Flag_1';
 let CONTAINER_EXTRACT_THRESHOLD = 300;
 let MIN_CD_TO_TRAVEL = 30;
 let ENERGY_PICKUP_THRESHOLD = 10;
+let ENERGY_PICKUP_RANGE = 5;
 
 module.exports = {
 	getAllCreepsInfo: function() {
@@ -132,10 +133,10 @@ module.exports = {
 	        var inRangeTowers = creep.pos.findInRange(towers, 5);
 
 	        if (inRangeTowers.length) {
-	        	isTransferring = true;
 	        	creep.say('tower!');
 	            // fill target
 	            if (creep.transfer(inRangeTowers[0], RESOURCE_ENERGY) === ERR_NOT_IN_RANGE) {
+		        	isTransferring = true;
 	                creep.moveTo(inRangeTowers[0]);
 	            }
 	        }
@@ -146,16 +147,16 @@ module.exports = {
 	pickupNearbyResource: function(creep) {
 		var isPickingUp = false;
 		// check if creep can pickup
-		if (creep.carry.energy <= creep.carryCapacity - 10) {
-			var droppedEnergy = creep.pos.findInRange(FIND_DROPPED_ENERGY, 4, {
+		if (creep.carry.energy <= creep.carryCapacity - ENERGY_PICKUP_THRESHOLD) {
+			var droppedEnergy = creep.pos.findInRange(FIND_DROPPED_ENERGY, ENERGY_PICKUP_RANGE, {
 				filter: (energy) => {
                     return energy.amount > ENERGY_PICKUP_THRESHOLD;
                 }
 			});
 			if (droppedEnergy.length > 0) {
-				isPickingUp = true;
 				creep.say('no waste!');
 				if(creep.pickup(droppedEnergy[0]) === ERR_NOT_IN_RANGE) {
+					isPickingUp = true;
 			        creep.moveTo(droppedEnergy[0]);
 			    }
 			}
