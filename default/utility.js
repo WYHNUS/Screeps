@@ -83,7 +83,8 @@ module.exports = {
         	var containers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
                     return (structure.structureType === STRUCTURE_CONTAINER)
-                        && (structure.store[RESOURCE_ENERGY] > 0);
+                        && (structure.store[RESOURCE_ENERGY] > 0)
+                        ||	(structure.structureType === STRUCTURE_STORAGE);
                 }
             });
             containers.sort((a, b) => {
