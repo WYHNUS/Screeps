@@ -2,6 +2,7 @@
 var harvesterCtr = require('role.harvester');
 var upgraderCtr = require('role.upgrader');
 var builderCtr = require('role.builder');
+var crusaderCtr = require('role.crusader');
 
 // structure controller
 var spawnCtr = require('structure.spawn');
@@ -35,6 +36,8 @@ module.exports.loop = function() {
                 case 'builder':
                     builderCtr.run(creep);
                     break;
+                case 'crusader':
+                    crusaderCtr.run(creep);
                 default:
                     console.log('unhanddled role: ' + creep.memory.role + ' in handler.');
             }
