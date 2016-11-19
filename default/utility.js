@@ -37,6 +37,17 @@ module.exports = {
 	    );
 	},
 
+	// check if current harvest speed is faster than resource regeneration speed
+	isHarvestEfficient: function(creep) {
+		var sources = creep.room.find(FIND_SOURCES);
+		var selectedSource = sources[0];
+		if (creep.memory.resIndex === 1 && sources.length >= 1) {
+			selectedSource = sources[1];
+		}
+		// console.log(selectedSource.energy / 10 < selectedSource.ticksToRegeneration);
+		return (selectedSource.energy / 10 < selectedSource.ticksToRegeneration);
+	},
+
 	// ask creep to harvest resource
 	instructHarvest: function(creep) {
 		var sources = creep.room.find(FIND_SOURCES);

@@ -30,6 +30,9 @@ let CREEP_DETAILS = {
     builder: {
         enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
+    },
+    crusader: {
+        basic: [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE]
     }
 };
 let HARVESTER_BASIC_THREADSHOLD = 2;
@@ -56,6 +59,20 @@ function calculateCost(arr) {
 
 module.exports = {
     // use given roomName and spawnName to find specified spawn structure
+    // spawn crusader manually (need to disable spawn once generated)
+    spawnCrusader: function(roomName, spawnName, mecca) {
+        var crusaderCost = calculateCost(CREEP_DETAILS['crusader'].basic);
+
+        if (Game.rooms[roomName].energyAvailable >= crusaderCost) {
+            Game.spawns[spawnName].createCreep(
+                CREEP_DETAILS[role].basic, undefined, { role: 'crusader', mecca: mecca }
+            ); 
+            return true;
+        } else {
+            return false;
+        }
+    },
+
     // and spawn creep with given role 
     spawn: function(roomName, spawnName) {
         // get number of creeps statistic

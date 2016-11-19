@@ -2,7 +2,11 @@ module.exports = {
 	pilgrimage: function(crusader) {
 		var isMarching = false;
 		// to be done --> march to mecca if not already there
-		console.log(crusader.memory.mecca);
+		if (crusader.room.name !== crusader.memory.mecca) {
+			// Allahu akbar!
+			isMarching = true;
+			crusader.moveTo(new RoomPosition(25, 25, crusader.memory.mecca));
+		}
 		
 		return isMarching;
 	},
@@ -55,6 +59,7 @@ module.exports = {
 			// arrived at destination! Let the party begin :D
 			if (!this.attack(crusader)) {
 				crusader('Peace. :)');
+				console.log('World Peace! :D')
 			}
 		}
 	}
