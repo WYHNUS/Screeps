@@ -16,7 +16,12 @@ let CREEP_LIMITS = {
 let CREEP_COST = {
     MOVE: 50,
     WORK: 100,
-    CARRY: 50
+    CARRY: 50,
+    ATTACK: 80,
+    RANGED_ATTACK: 150,
+    HEAL: 250,
+    CLAIM: 600,
+    TOUGH: 10
 };
 let CREEP_DETAILS = {
     harvester: {
@@ -32,7 +37,7 @@ let CREEP_DETAILS = {
         basic: [WORK, CARRY, MOVE]
     },
     crusader: {
-        basic: [ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE, ATTACK, MOVE]
+        basic: [ATTACK, MOVE, ATTACK, MOVE]
     }
 };
 let HARVESTER_BASIC_THREADSHOLD = 2;
@@ -61,13 +66,20 @@ module.exports = {
     // use given roomName and spawnName to find specified spawn structure
     // spawn crusader manually (need to disable spawn once generated)
     spawnCrusader: function(roomName, spawnName, mecca) {
-        var crusaderCost = calculateCost(CREEP_DETAILS['crusader'].basic);
+        var crusaderCost = calculateCost(CREEP_DETAILS.crusader.basic);
 
         if (Game.rooms[roomName].energyAvailable >= crusaderCost) {
-            Game.spawns[spawnName].createCreep(
-                CREEP_DETAILS[role].basic, undefined, { role: 'crusader', mecca: mecca }
+            var result = Game.spawns[spawnName].createCreep(
+                CREEP_DETAILS.crusader.basic, undefined, { role: 'crusader', mecca: mecca }
             ); 
-            return true;
+            if (_.isString(result)) {
+                createCreepLog(result, 'crusader');
+                return true;
+            } else {
+                // handle error
+                createCreepLog(result, 'crusader');
+                return false;
+            }
         } else {
             return false;
         }
@@ -87,7 +99,7 @@ module.exports = {
             if (count[mem.role] !==  undefined) {
                 count[mem.role][mem.resIndex]++;
             } else {
-                console.log('unknown creep role: ' + mem.role + ' with name: ' + name);
+                // console.log('unknown creep role: ' + mem.role + ' with name: ' + name);
             }
         }
 
@@ -152,6 +164,9 @@ module.exports = {
                         }
                         break;
 
+                    // don't spawn
+                    case 'crusader':
+                        break;
                     default:
                         console.log('unhanddled role: ' + creep.memory.role + ' in creating role.');
                 }

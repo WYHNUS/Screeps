@@ -24,15 +24,15 @@ module.exports = {
     	var hostileSpawn = crusader.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
 
         if (hostileTower) {
-        	crusader.say('Allahu akbar!');
+        	crusader.say('Allahu AKB!');
+        	isAttacking = true;
             if (crusader.attack(hostileTower) === ERR_NOT_IN_RANGE) {
-            	isAttacking = true;
 		        crusader.moveTo(hostileTower);
 		    }
         } else if (hostileSpawn) {
         	crusader.say('GLHF :D');
+        	isAttacking = true;
             if (crusader.attack(hostileSpawn) === ERR_NOT_IN_RANGE) {
-            	isAttacking = true;
 		        crusader.moveTo(hostileSpawn);
 		    }
 		} else {
@@ -43,11 +43,13 @@ module.exports = {
 				}
 			});
 	        if (hostileCitizen) {
-	        	crusader.say('Allahu akbar!');
+	        	crusader.say('Allahu AKB!');
+            	isAttacking = true;
 	        	if (crusader.attack(hostileCitizen) === ERR_NOT_IN_RANGE) {
-	            	isAttacking = true;
 			        crusader.moveTo(hostileCitizen);
 			    }
+	        } else {
+	        	// attack other buildings
 	        }
 		}
 
@@ -58,7 +60,7 @@ module.exports = {
 		if (!this.pilgrimage(crusader)) {
 			// arrived at destination! Let the party begin :D
 			if (!this.attack(crusader)) {
-				crusader('Peace. :)');
+				crusader.say('Peace. :)');
 				console.log('World Peace! :D')
 			}
 		}

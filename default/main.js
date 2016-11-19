@@ -13,6 +13,7 @@ var util = require('utility');
 // constant
 let SPAWN = 'Spawn1';
 let ROOM = 'W63N43';
+let TARGET_ROOM = 'W63N42';
 
 module.exports.loop = function() {
     // select all creeps
@@ -48,6 +49,9 @@ module.exports.loop = function() {
 
     // check if is currently spawning
     if (Game.spawns[SPAWN].spawning === null) {
+        // only enable when wanna attack XD
+        // spawnCtr.spawnCrusader(ROOM, SPAWN, TARGET_ROOM);
+
         // if not spawning, spawn if needed
         spawnCtr.spawn(ROOM, SPAWN);
     }
