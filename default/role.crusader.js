@@ -60,8 +60,7 @@ module.exports = {
 		if (!this.pilgrimage(crusader)) {
 			// arrived at destination! Let the party begin :D
 			if (!this.attack(crusader)) {
-				crusader.say('Peace. :)');
-				console.log('World Peace! :D')
+				crusader.say('Peace. :D');
 			}
 		}
 	}

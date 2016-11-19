@@ -11,7 +11,10 @@ let CREEP_LIMITS = {
     builder: {
         resIndex1: 1,
         resIndex2: 1
-    }
+    },
+    expeditor: [
+        { mecca: 'W63N42', number: 0 }
+    ]
 };
 let CREEP_COST = {
     MOVE: 50,
@@ -35,6 +38,9 @@ let CREEP_DETAILS = {
     builder: {
         enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
+    },
+    expeditor: {
+        basic: [WORK, MOVE, WORK, CARRY, MOVE, MOVE, WORK, CARRY, MOVE, MOVE, WORK, CARRY, MOVE, MOVE]
     },
     crusader: {
         basic: [ATTACK, MOVE, ATTACK, MOVE]
@@ -90,14 +96,26 @@ module.exports = {
         // get number of creeps statistic
         var count = {};
         for (var role in CREEP_LIMITS) {
-            count[role] = {
-                0: 0, 1: 0
-            };
+            if (CREEP_LIMITS[role].resIndex1 !== undefined) {
+                count[role] = {
+                    0: 0, 1: 0
+                };   
+            } else if (role === 'expeditor') {
+                count[role] = {};
+                for (var i in CREEP_LIMITS[role]) {
+                    var mecca = CREEP_LIMITS[role][i]['mecca'];
+                    count[role][mecca] = 0;
+                }
+            }
         }
         for (var name in Game.creeps) {
             var mem = Game.creeps[name].memory;
             if (count[mem.role] !==  undefined) {
-                count[mem.role][mem.resIndex]++;
+                if (mem.resIndex !==  undefined) {
+                    count[mem.role][mem.resIndex]++;
+                } else if (mem.role === 'expeditor') {
+                    count[mem.role][mem.mecca]++;
+                }
             } else {
                 // console.log('unknown creep role: ' + mem.role + ' with name: ' + name);
             }
@@ -107,10 +125,27 @@ module.exports = {
             // add creeps if not enough
             var isSpawning = false;
 
-            if (count[role][0] + count[role][1] < CREEP_LIMITS[role].resIndex1 + CREEP_LIMITS[role].resIndex2) {
-                var currentEnergy = Game.rooms[roomName].energyAvailable;
+            var shouldAllocate = false;
+            var assignIndex = -1;
+            var mecca = undefined;
+
+            if (CREEP_LIMITS[role].resIndex1 !== undefined) {
+                shouldAllocate = count[role][0] + count[role][1] < CREEP_LIMITS[role].resIndex1 + CREEP_LIMITS[role].resIndex2;
                 // assign harvest resource index
-                var assignIndex = (count[role][0] < CREEP_LIMITS[role].resIndex1 ? 0 : 1);
+                assignIndex = (count[role][0] < CREEP_LIMITS[role].resIndex1 ? 0 : 1);
+
+            } else if (role === 'expeditor') {
+                for (var i in CREEP_LIMITS[role]) {
+                    var expeditorArea = CREEP_LIMITS[role][i];
+                    if (count[role][expeditorArea['mecca']] < expeditorArea['number']) {
+                        shouldAllocate = true;
+                        mecca = expeditorArea['mecca'];
+                    }
+                }
+            }
+
+            if (shouldAllocate) {
+                var currentEnergy = Game.rooms[roomName].energyAvailable;
 
                 switch (role) {
                     case 'harvester':
@@ -164,11 +199,26 @@ module.exports = {
                         }
                         break;
 
+                    case 'expeditor':
+                        if (currentEnergy >= calculateCost(CREEP_DETAILS[role].basic)) {
+                            var result = Game.spawns[spawnName].createCreep(
+                                CREEP_DETAILS[role].basic, undefined, { role: role, home: roomName, mecca: mecca }
+                            );
+                            if (_.isString(result)) {
+                                isSpawning = true;
+                                createCreepLog(result, role);
+                            } else {
+                                // handle error
+                                createCreepLog(result, role);
+                            }
+                        }
+                        break;
+
                     // don't spawn
                     case 'crusader':
                         break;
                     default:
-                        console.log('unhanddled role: ' + creep.memory.role + ' in creating role.');
+                        console.log('unhanddled role: ' + role + ' in creating role.');
                 }
             }
 

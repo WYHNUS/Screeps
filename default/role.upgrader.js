@@ -17,7 +17,10 @@ module.exports = {
                     creep.moveTo(creep.room.controller);
                 }
             } else {
-                if (!util.withdrawFromNearbyContainer(creep)) {
+                if (!util.isHarvestEfficient(creep)) {
+                    // not efficient --> ask to help harvest more
+                    util.instructHarvest(creep);
+                } else if (!util.withdrawFromNearbyContainer(creep)) {
                     util.instructHarvest(creep);
                 }
             }
