@@ -1,21 +1,4 @@
 // constants
-let CREEP_LIMITS = {
-    harvester: {
-        resIndex1: 2,
-        resIndex2: 2
-    },
-    upgrader: {
-        resIndex1: 1,
-        resIndex2: 1
-    },
-    builder: {
-        resIndex1: 1,
-        resIndex2: 1
-    },
-    expeditor: [
-        { mecca: 'W63N42', number: 0 }
-    ]
-};
 let CREEP_COST = {
     MOVE: 50,
     WORK: 100,
@@ -25,29 +8,6 @@ let CREEP_COST = {
     HEAL: 250,
     CLAIM: 600,
     TOUGH: 10
-};
-let CREEP_DETAILS = {
-    harvester: {
-        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
-        basic: [WORK, CARRY, MOVE]
-    },
-    upgrader: {
-        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
-        basic: [WORK, CARRY, MOVE]
-    },
-    builder: {
-        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE, WORK, CARRY, MOVE],
-        basic: [WORK, CARRY, MOVE]
-    },
-    expeditor: {
-        basic: [WORK, MOVE, WORK, CARRY, MOVE, MOVE, WORK, CARRY, MOVE, MOVE, WORK, CARRY, MOVE, MOVE]
-    },
-    crusader: {
-        basic: [ATTACK, MOVE, ATTACK, MOVE]
-    },
-    missionary: {
-        basic: [CLAIM, MOVE]
-    }
 };
 let HARVESTER_BASIC_THREADSHOLD = 2;
 
@@ -74,15 +34,16 @@ function calculateCost(arr) {
 module.exports = {
     // use given roomName and spawnName to find specified spawn structure
     // spawn crusader manually (need to disable spawn once generated)
-    spawnCrusader: function(roomName, spawnName, mecca) {
-        var crusaderCost = calculateCost(CREEP_DETAILS.crusader.basic);
+    spawnCrusader: function(roomName, spawnName, mecca, crusaderAttributes) {
+        var crusaderCost = calculateCost(crusaderAttributes);
 
         if (Game.rooms[roomName].energyAvailable >= crusaderCost) {
             var result = Game.spawns[spawnName].createCreep(
-                CREEP_DETAILS.crusader.basic, undefined, { role: 'crusader', mecca: mecca }
+                crusaderAttributes, undefined, 
+                { role: 'crusader', mecca: mecca, originRoom: roomName  }
             ); 
             if (_.isString(result)) {
-                createCreepLog(result, 'crusader');
+                createCreepLog(result, 'crusader', true);
                 return true;
             } else {
                 // handle error
@@ -94,15 +55,16 @@ module.exports = {
         }
     },
 
-    spawnMissionary: function(roomName, spawnName, mecca) {
-        var missionaryCost = calculateCost(CREEP_DETAILS.missionary.basic);
+    spawnMissionary: function(roomName, spawnName, mecca, missionaryAttributes) {
+        var missionaryCost = calculateCost(missionaryAttributes);
 
         if (Game.rooms[roomName].energyAvailable >= missionaryCost) {
             var result = Game.spawns[spawnName].createCreep(
-                CREEP_DETAILS.missionary.basic, undefined, { role: 'missionary', mecca: mecca }
+                missionaryAttributes, undefined, 
+                { role: 'missionary', mecca: mecca, originRoom: roomName  }
             ); 
             if (_.isString(result)) {
-                createCreepLog(result, 'missionary');
+                createCreepLog(result, 'missionary', true);
                 return true;
             } else {
                 // handle error
@@ -115,7 +77,7 @@ module.exports = {
     },
 
     // and spawn creep with given role 
-    spawn: function(roomName, spawnName) {
+    spawn: function(roomName, spawnName, CREEP_DETAILS, CREEP_LIMITS) {
         // get number of creeps statistic
         var count = {};
         for (var role in CREEP_LIMITS) {
@@ -133,14 +95,14 @@ module.exports = {
         }
         for (var name in Game.creeps) {
             var mem = Game.creeps[name].memory;
-            if (count[mem.role] !==  undefined) {
-                if (mem.resIndex !==  undefined) {
-                    count[mem.role][mem.resIndex]++;
-                } else if (mem.role === 'expeditor') {
-                    count[mem.role][mem.mecca]++;
+            if (mem.originRoom === roomName) {
+                if (count[mem.role] !==  undefined) {
+                    if (mem.resIndex !==  undefined) {
+                        count[mem.role][mem.resIndex]++;
+                    } else if (mem.role === 'expeditor') {
+                        count[mem.role][mem.mecca]++;
+                    }
                 }
-            } else {
-                // console.log('unknown creep role: ' + mem.role + ' with name: ' + name);
             }
         }
 
@@ -176,7 +138,8 @@ module.exports = {
                         
                         if (currentEnergy >= superCreepCost) {
                             var result = Game.spawns[spawnName].createCreep(
-                                CREEP_DETAILS[role].enhanced, undefined, { role: role, resIndex: assignIndex }
+                                CREEP_DETAILS[role].enhanced, undefined, 
+                                { role: role, resIndex: assignIndex, originRoom: roomName }
                             );
                             if (_.isString(result)) {
                                 isSpawning = true;
@@ -190,7 +153,8 @@ module.exports = {
                             var creepCost = calculateCost(CREEP_DETAILS[role].basic);
                             if (currentEnergy >= creepCost) {
                                 var result = Game.spawns[spawnName].createCreep(
-                                    CREEP_DETAILS[role].basic, undefined, { role: role, resIndex: assignIndex }
+                                    CREEP_DETAILS[role].basic, undefined, 
+                                    { role: role, resIndex: assignIndex, originRoom: roomName }
                                 ); 
                                 if (_.isString(result)) {
                                     isSpawning = true;
@@ -210,7 +174,8 @@ module.exports = {
                         
                         if (currentEnergy >= superCreepCost) {
                             var result = Game.spawns[spawnName].createCreep(
-                                CREEP_DETAILS[role].enhanced, undefined, { role: role, resIndex: assignIndex }
+                                CREEP_DETAILS[role].enhanced, undefined, 
+                                { role: role, resIndex: assignIndex, originRoom: roomName }
                             );
                             if (_.isString(result)) {
                                 isSpawning = true;
@@ -225,7 +190,8 @@ module.exports = {
                     case 'expeditor':
                         if (currentEnergy >= calculateCost(CREEP_DETAILS[role].basic)) {
                             var result = Game.spawns[spawnName].createCreep(
-                                CREEP_DETAILS[role].basic, undefined, { role: role, home: roomName, mecca: mecca }
+                                CREEP_DETAILS[role].basic, undefined, 
+                                { role: role, home: roomName, mecca: mecca, originRoom: roomName }
                             );
                             if (_.isString(result)) {
                                 isSpawning = true;

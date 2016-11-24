@@ -2,7 +2,9 @@ var util = require('utility');
 
 module.exports = {
     run: function(creep) {
-        if (!util.pickupNearbyResource(creep)) {
+        if (util.marchIfNotInRoom(creep) || util.pickupNearbyResource(creep)) {
+
+        } else {
             if (creep.memory.upgrading && creep.carry.energy == 0) {
                 creep.memory.upgrading = false;
                 creep.say('harvesting');

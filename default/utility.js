@@ -18,10 +18,12 @@ module.exports = {
         	count[role][resIndex]++;
         }
 
-	    console.log('\n name     role    resIndex    TTL');
+	    console.log('\n name     role    resIndex    originRoom    TTL');
 	    for (var name in Game.creeps) {
 	        var creep = Game.creeps[name];
-	        console.log(name + '  ' + creep.memory.role + '     ' + (creep.memory.resIndex+1) + '       ' + creep.ticksToLive);
+	        console.log(name + '  ' + creep.memory.role + '     ' 
+	        	+ (creep.memory.resIndex+1) + '          ' + creep.memory.originRoom
+	        	+ '       ' + creep.ticksToLive);
 	    }
 
 	    console.log('\n role statistic');
@@ -190,5 +192,14 @@ module.exports = {
             }
         }
         return isMoving;
+	},
+
+	marchIfNotInRoom: function(creep) {
+		var shouldMarch = (creep.room.name !== creep.memory.originRoom);
+        if (shouldMarch) {
+        	creep.say('march!!!');
+        	creep.moveTo(new RoomPosition(25, 25, creep.memory.originRoom));
+        }
+        return shouldMarch;
 	}
 }

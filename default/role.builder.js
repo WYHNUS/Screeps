@@ -13,7 +13,8 @@ module.exports = {
 	        creep.say('building');
 	    }
 
-        if (util.rechargeTowerIfNearby(creep) || util.pickupNearbyResource(creep)) {
+        if (util.marchIfNotInRoom(creep) || util.rechargeTowerIfNearby(creep) 
+            || util.pickupNearbyResource(creep)) {
 
         } else if (creep.memory.building) {
             // find construction sites which need to be built
@@ -29,8 +30,18 @@ module.exports = {
                     }
             });
 
-	    	// check if any target needs to be repaired immediately
-	    	if (immediate_repair_targets.length) {
+            // check if any target needs to be constructed, sort by nearest distance first
+	    	if (construction_targets.length) {
+                construction_targets.sort((a, b) => {
+                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
+                });
+                if (creep.build(construction_targets[0]) == ERR_NOT_IN_RANGE) {
+                    creep.say('Construct!');
+                    creep.moveTo(construction_targets[0]);
+                }
+
+            } else if (immediate_repair_targets.length) {
+                // check if any target needs to be repaired immediately
                 // sort by cloest distance
                 immediate_repair_targets.sort((a, b) => {
                     return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
@@ -40,17 +51,7 @@ module.exports = {
                     creep.moveTo(immediate_repair_targets[0]);
                 }
 
-            } else if (construction_targets.length) {
-	    		// check if any target needs to be constructed, sort by nearest distance first
-                construction_targets.sort((a, b) => {
-                    return (util.calcDistance(a.pos, creep.pos) - util.calcDistance(b.pos, creep.pos));
-                });
-                if (creep.build(construction_targets[0]) == ERR_NOT_IN_RANGE) {
-                    creep.say('Construct!');
-                    creep.moveTo(construction_targets[0]);
-                }
-
-            } else  {
+            } else {
                 var all_repair_targets = creep.room.find(FIND_STRUCTURES, {
                         filter: (structure) => {
                             return (structure.hits < 0.9 * structure.hitsMax);
