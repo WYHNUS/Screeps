@@ -44,6 +44,9 @@ let CREEP_DETAILS = {
     },
     crusader: {
         basic: [ATTACK, MOVE, ATTACK, MOVE]
+    },
+    missionary: {
+        basic: [CLAIM, MOVE]
     }
 };
 let HARVESTER_BASIC_THREADSHOLD = 2;
@@ -84,6 +87,26 @@ module.exports = {
             } else {
                 // handle error
                 createCreepLog(result, 'crusader');
+                return false;
+            }
+        } else {
+            return false;
+        }
+    },
+
+    spawnMissionary: function(roomName, spawnName, mecca) {
+        var missionaryCost = calculateCost(CREEP_DETAILS.missionary.basic);
+
+        if (Game.rooms[roomName].energyAvailable >= missionaryCost) {
+            var result = Game.spawns[spawnName].createCreep(
+                CREEP_DETAILS.missionary.basic, undefined, { role: 'missionary', mecca: mecca }
+            ); 
+            if (_.isString(result)) {
+                createCreepLog(result, 'missionary');
+                return true;
+            } else {
+                // handle error
+                createCreepLog(result, 'missionary');
                 return false;
             }
         } else {

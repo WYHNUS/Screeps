@@ -3,6 +3,7 @@ var harvesterCtr = require('role.harvester');
 var upgraderCtr = require('role.upgrader');
 var builderCtr = require('role.builder');
 var crusaderCtr = require('role.crusader');
+var missionaryCtr = require('role.missionary');
 
 // structure controller
 var spawnCtr = require('structure.spawn');
@@ -14,6 +15,7 @@ var util = require('utility');
 let SPAWN = 'Spawn1';
 let ROOM = 'W63N43';
 let CRUSADE_TARGET_ROOM = 'W63N42';
+let MISSIONARY_TARGET_ROOM = 'W63N42';
 
 module.exports.loop = function() {
     // select all creeps
@@ -43,6 +45,9 @@ module.exports.loop = function() {
                 case 'expeditor':
                     harvesterCtr.embark(creep);
                     break;
+                case 'missionary':
+                    missionaryCtr.run(creep);
+                    break;
                 default:
                     console.log('unhanddled role: ' + creep.memory.role + ' in handler.');
             }
@@ -52,8 +57,9 @@ module.exports.loop = function() {
 
     // check if is currently spawning
     if (Game.spawns[SPAWN].spawning === null) {
-        // only enable when wanna attack XD
+        // only enable when wanna attack / convert XD
         // spawnCtr.spawnCrusader(ROOM, SPAWN, CRUSADE_TARGET_ROOM);
+        // spawnCtr.spawnMissionary(ROOM, SPAWN, MISSIONARY_TARGET_ROOM);
 
         // if not spawning, spawn if needed
         spawnCtr.spawn(ROOM, SPAWN);

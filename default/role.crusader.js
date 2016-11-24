@@ -27,13 +27,23 @@ module.exports = {
         	crusader.say('Allahu AKB!');
         	isAttacking = true;
             if (crusader.attack(hostileTower) === ERR_NOT_IN_RANGE) {
-		        crusader.moveTo(hostileTower);
+		        if (crusader.moveTo(hostileTower) === ERR_NO_PATH) {
+		        	// blocked by some building --> need better logic here
+		        	// attack nearest building for now
+		        	var hostileBuilding = crusader.pos.findClosestByRange(FIND_STRUCTURES);
+		        	crusader.attack(hostileBuilding);
+		        }
 		    }
         } else if (hostileSpawn) {
         	crusader.say('GLHF :D');
         	isAttacking = true;
             if (crusader.attack(hostileSpawn) === ERR_NOT_IN_RANGE) {
-		        crusader.moveTo(hostileSpawn);
+		        if (crusader.moveTo(hostileSpawn) === ERR_NO_PATH) {
+		        	// blocked by some building --> need better logic here
+		        	// attack nearest building for now
+		        	var hostileBuilding = crusader.pos.findClosestByRange(FIND_STRUCTURES);
+		        	crusader.attack(hostileBuilding);
+		        }
 		    }
 		} else {
 			// look for creep without attack part
@@ -50,6 +60,19 @@ module.exports = {
 			    }
 	        } else {
 	        	// attack other buildings
+	        	var hostileBuilding = crusader.pos.findClosestByRange(FIND_STRUCTURES, {
+					filter: function(structure) {
+				        return structure.structureType != STRUCTURE_ROAD
+				        	&& structure.structureType != STRUCTURE_CONTROLLER;
+				    }
+				});
+	        	if (hostileBuilding) {
+	            	isAttacking = true;
+	        		crusader.say('Allahu AKB!');
+		        	if (crusader.attack(hostileBuilding) === ERR_NOT_IN_RANGE) {
+			        	crusader.moveTo(hostileBuilding);
+		        	}
+	        	}
 	        }
 		}
 
