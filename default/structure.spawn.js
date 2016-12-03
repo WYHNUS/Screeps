@@ -131,7 +131,6 @@ module.exports = {
 
             if (shouldAllocate) {
                 var currentEnergy = Game.rooms[roomName].energyAvailable;
-
                 switch (role) {
                     case 'harvester':
                         var superCreepCost = calculateCost(CREEP_DETAILS[role].enhanced);
@@ -148,7 +147,7 @@ module.exports = {
                                 // handle error
                                 createCreepLog(result, role);
                             }
-                        } else if (count[role] <= HARVESTER_BASIC_THREADSHOLD) {
+                        } else if (_.sum(count[role]) <= HARVESTER_BASIC_THREADSHOLD) {
                             // only create basic creep if too little harvester are present
                             var creepCost = calculateCost(CREEP_DETAILS[role].basic);
                             if (currentEnergy >= creepCost) {

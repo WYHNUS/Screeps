@@ -17,8 +17,10 @@ module.exports = {
 		var isConverting = false;
 
 		var controller = missionary.room.controller;
-		var isOwn =  (controller.owner.username) 
-						? (controller.owner.username === USER_NAME)
+		var isOwn = controller.owner 
+						? (controller.owner.username) 
+							? (controller.owner.username === USER_NAME)
+							: false
 						: false;
 		if (controller && !isOwn) {
 	    	isConverting = true;

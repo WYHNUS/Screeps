@@ -62,12 +62,12 @@ let SPAWN_2 = 'Spawn2';
 let ROOM_2 = 'W63N42';
 let CREEP_LIMITS_2 = {
     harvester: {
-        resIndex1: 1,
+        resIndex1: 2,
         resIndex2: 0
     },
     upgrader: {
         resIndex1: 0,
-        resIndex2: 2
+        resIndex2: 3
     },
     builder: {
         resIndex1: 2,
@@ -76,7 +76,7 @@ let CREEP_LIMITS_2 = {
 };
 let CREEP_DETAILS_2 = {
     harvester: {
-        enhanced: [WORK, CARRY, MOVE],
+        enhanced: [WORK, CARRY, MOVE, WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     },
     upgrader: {
@@ -84,7 +84,7 @@ let CREEP_DETAILS_2 = {
         basic: [WORK, CARRY, MOVE]
     },
     builder: {
-        enhanced: [WORK, CARRY, MOVE, MOVE],
+        enhanced: [WORK, CARRY, MOVE],
         basic: [WORK, CARRY, MOVE]
     }
 };
@@ -130,8 +130,8 @@ module.exports.loop = function() {
     // check if is currently spawning
     if (Game.spawns[SPAWN_1].spawning === null) {
         // only enable when wanna attack / convert XD
-        // spawnCtr.spawnCrusader(ROOM_1, SPAWN_1, CRUSADE_TARGET_ROOM, CREEP_DETAILS.crusader.basic);
-        // spawnCtr.spawnMissionary(ROOM_1, SPAWN_1, MISSIONARY_TARGET_ROOM, CREEP_DETAILS.missionary.basic);
+        // spawnCtr.spawnCrusader(ROOM_1, SPAWN_1, CRUSADE_TARGET_ROOM, CREEP_DETAILS_1.crusader.basic);
+        // spawnCtr.spawnMissionary(ROOM_1, SPAWN_1, MISSIONARY_TARGET_ROOM, CREEP_DETAILS_1.missionary.basic);
 
         // if not spawning, spawn if needed
         spawnCtr.spawn(ROOM_1, SPAWN_1, CREEP_DETAILS_1, CREEP_LIMITS_1);
